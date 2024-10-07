@@ -8,8 +8,18 @@ This package provides two Bash scripts for PostgreSQL database management:
 
 1. **Backup Script**: Backs up each PostgreSQL database individually along with user roles/permissions.
 2. **Restore Script**: Restores each PostgreSQL database from the backup and applies saved user roles/permissions.
+3. **Check Env**: This script checks that your env file has the correct contents.
 
-The scripts are designed to keep your database backups organized, secure, and easy to restore, and they source configuration settings from a `.env` file.
+The idea here is that we can backup all the databases on a cluster as
+separate files, including the cluster's config files and then restore
+them to a new cluster, optionally filtering out any particular
+database.
+
+The database backups will be .dump files produced by pg_dump with the
+`-F c` flag, that is the single file that represents the database.
+
+The restore script won't run if it looks like the cluster isn't empty.
+
 
 ---
 
@@ -20,6 +30,8 @@ The scripts are designed to keep your database backups organized, secure, and ea
 - **Restore databases and user roles** from individual backup files.
 - **Secure environment configuration**: Settings are stored in a `.env` file, with strict permissions (`chmod 600`).
 - **Permission checks**: Ensures `.env` file has the correct security permissions before running.
+- **Customizable Paths**: Automatically update paths in the `postgresql.conf` file based on environment variables.
+- **Filtering**: Optionally filter databases during restore operations to skip databases that do not match a specified pattern.
 
 ---
 
@@ -43,10 +55,10 @@ The scripts are designed to keep your database backups organized, secure, and ea
 2. **Create a `.env` file** in the root directory of the project:
 
    ```bash
-   touch .env
+   touch mycluster.env
    ```
 
-3. **Edit the `.env` file** with your PostgreSQL settings:
+3. **Edit the `mycluster.env` file** with your PostgreSQL settings:
 
    ```bash
    PGUSER=your_pg_user
@@ -56,7 +68,7 @@ The scripts are designed to keep your database backups organized, secure, and ea
    BACKUP_DIR=/path/to/backup
    ```
 
-4. **Secure the `.env` file** by setting the correct permissions:
+4. **Secure the `mycluster.env` file** by setting the correct permissions:
 
    ```bash
    chmod 600 .env
@@ -75,20 +87,27 @@ The backup script will:
 To run the backup script:
 
 ```bash
-./pg_backup.sh
+./pg_backup.sh mycluster.env
 ```
 
 #### 2. **Restore Script**
 
-The restore script will:
-- Restore all databases from individual backup files.
+The restore script will, in this order:
 - Restore user roles and permissions.
+- Restore the postgresql configuration
+- Restore all databases from individual backup files, unless there is
+  a filter option.
 
 To run the restore script:
 
 ```bash
-./pg_restore.sh
+./pg_restore.sh mycluster.env
 ```
+
+Note that the cluster you save to can be different to that you backed
+up from, but there will be limitations from the pg_dump command that
+does the real work that you should know about.
+
 
 ---
 
