@@ -6,9 +6,10 @@
 
 This package provides two Bash scripts for PostgreSQL database management:
 
-1. **Backup Script**: Backs up each PostgreSQL database individually along with user roles/permissions.
-2. **Restore Script**: Restores each PostgreSQL database from the backup and applies saved user roles/permissions.
-3. **Check Env**: This script checks that your env file has the correct contents.
+1. `backup.sh`: Backs up each PostgreSQL database individually along with user roles/permissions.
+2. `restore.sh`: Restores each PostgreSQL database from the backup and applies saved user roles/permissions.
+3. `clean-dir.sh`: Deletes old backups, but never the latest backup.
+4. `check-env.sh`: This script checks that your env file has the correct contents.
 
 The idea here is that we can backup all the databases on a cluster as
 separate files, including the cluster's config files and then restore
