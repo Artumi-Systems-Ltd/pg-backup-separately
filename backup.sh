@@ -49,6 +49,8 @@ pg_dumpall -U "$PGUSER" -h "$PGHOST" -p "$PGPORT" --roles-only >"$BACKUP_PATH/us
 
 # Backup PostgreSQL configuration files
 if [ -z "$SKIP_CLUSTER_CONFIG" ]; then
+    echo "Not backing up PostgreSQL config files as per ENV SKIP_CLUSTER_CONFIG"
+else
     echo "Backing up PostgreSQL configuration files"
     CONFIG_FILES=(
         "/etc/postgresql/${PGVERSION}/${PGCLUSTER}/postgresql.conf"
@@ -63,8 +65,6 @@ if [ -z "$SKIP_CLUSTER_CONFIG" ]; then
             echo "Error: Unable to back up $config. Check your permissions."
         fi
     done
-else
-    echo "Not backing up files as per ENV"
 fi
 
 # Clean up
